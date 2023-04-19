@@ -1,3 +1,5 @@
+import time
+
 from colorama import Fore
 
 from autogpt.config import Config
@@ -7,6 +9,7 @@ from autogpt.logs import logger
 from autogpt.promptgenerator import PromptGenerator
 from autogpt.setup import prompt_user
 from autogpt.utils import clean_input
+import my.oper_file as my_file_util
 
 CFG = Config()
 
@@ -183,19 +186,23 @@ def construct_prompt() -> str:
             f"Would you like me to return to being {config.ai_name}?",
             speak_text=True,
         )
-        should_continue = clean_input(
-            f"""Continue with the last settings?
-Name:  {config.ai_name}
-Role:  {config.ai_role}
-Goals: {config.ai_goals}
-Continue (y/n): """
-        )
+        my_file_util.write_step("99")
+        my_file_util.write_tips("Welcome back!  Would you like me to return to being " + config.ai_name + "?")
+        # todo wangyl 等待用户操作 99
+        user_auth = my_file_util.read_auth()
+        # 等待用户操作
+        while len(user_auth) == 0:
+            time.sleep(1)
+            user_auth = my_file_util.read_auth()
+        should_continue = user_auth
         if should_continue.lower() == "n":
             config = AIConfig()
 
     if not config.ai_name:
         config = prompt_user()
         config.save(CFG.ai_settings_file)
+        # 清空用户授权
+        my_file_util.write_auth("")
 
     # Get rid of this global:
     global ai_name

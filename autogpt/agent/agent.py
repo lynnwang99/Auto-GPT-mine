@@ -1,3 +1,6 @@
+import json
+import time
+
 from colorama import Fore, Style
 
 from autogpt.app import execute_command, get_command
@@ -9,6 +12,7 @@ from autogpt.logs import logger, print_assistant_thoughts
 from autogpt.speech import say_text
 from autogpt.spinner import Spinner
 from autogpt.utils import clean_input
+import my.oper_file as my_file_util
 
 
 class Agent:
@@ -56,6 +60,7 @@ class Agent:
         command_name = None
         arguments = None
         user_input = ""
+        # 当前执行进度【step 0: start 1: thinking 2: wait user 3: executing 4: result】
 
         while True:
             # Discontinue if continuous limit is reached
@@ -70,6 +75,7 @@ class Agent:
                 )
                 break
 
+            my_file_util.write_step("1")
             # Send message to AI, get response
             with Spinner("Thinking... "):
                 assistant_reply = chat_with_ai(
@@ -81,6 +87,11 @@ class Agent:
                 )  # TODO: This hardcodes the model to use GPT3.5. Make this an argument
 
             assistant_reply_json = fix_json_using_multiple_techniques(assistant_reply)
+
+            # openai返回结果写入
+            my_file_util.write_openai_reply(assistant_reply)
+
+            my_file_util.write_step("2")
 
             # Print Assistant thoughts
             if assistant_reply_json != {}:
@@ -112,9 +123,13 @@ class Agent:
                     flush=True,
                 )
                 while True:
-                    console_input = clean_input(
-                        Fore.MAGENTA + "Input:" + Style.RESET_ALL
-                    )
+                    # 改为等待用户授权操作
+                    user_auth = my_file_util.read_auth()
+                    # 等待用户操作
+                    while len(user_auth) == 0:
+                        time.sleep(1)
+                        user_auth = my_file_util.read_auth()
+                    console_input = user_auth
                     if console_input.lower().strip() == "y":
                         user_input = "GENERATE NEXT COMMAND JSON"
                         break
@@ -143,14 +158,20 @@ class Agent:
                         break
 
                 if user_input == "GENERATE NEXT COMMAND JSON":
+                    # 用户授权执行操作，记录执行进度
+                    my_file_util.write_step("3")
                     logger.typewriter_log(
                         "-=-=-=-=-=-=-= COMMAND AUTHORISED BY USER -=-=-=-=-=-=-=",
                         Fore.MAGENTA,
                         "",
                     )
                 elif user_input == "EXIT":
+                    # 用户授权终止操作，记录执行进度
+                    my_file_util.write_step("0")
                     print("Exiting...", flush=True)
                     break
+                # 命令执行完毕，清空授权文件
+                my_file_util.write_auth("")
             else:
                 # Print command
                 logger.typewriter_log(
@@ -187,11 +208,15 @@ class Agent:
             # history
             if result is not None:
                 self.full_message_history.append(create_chat_message("system", result))
+                # 命令执行结果写入文件
+                my_file_util.write_command_result(result)
+                my_file_util.write_step("4")
                 logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
             else:
                 self.full_message_history.append(
                     create_chat_message("system", "Unable to execute command")
                 )
+                my_file_util.write_command_result("Unable to execute command")
                 logger.typewriter_log(
                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                 )

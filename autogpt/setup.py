@@ -1,9 +1,13 @@
 """Set up the AI and its goals"""
+import json
+import time
+
 from colorama import Fore, Style
 
 from autogpt import utils
 from autogpt.config.ai_config import AIConfig
 from autogpt.logs import logger
+import my.oper_file as my_file_util
 
 
 def prompt_user() -> AIConfig:
@@ -33,7 +37,17 @@ def prompt_user() -> AIConfig:
     logger.typewriter_log(
         "Name your AI: ", Fore.GREEN, "For example, 'Entrepreneur-GPT'"
     )
-    ai_name = utils.clean_input("AI Name: ")
+
+    # todo wangyl 创建目标
+    my_file_util.write_step("0")
+    tips = "Welcome to Auto-GPT! \nCreate an AI-Assistant: Set your AI name and role and goals."
+    my_file_util.write_tips(tips)
+    ai_info = my_file_util.read_ai_info()
+    while len(ai_info) == 0:
+        time.sleep(1)
+        ai_info = my_file_util.read_ai_info()
+    ai_info_json = json.loads(ai_info)
+    ai_name = ai_info_json["ai_name"]
     if ai_name == "":
         ai_name = "Entrepreneur-GPT"
 
@@ -48,7 +62,7 @@ def prompt_user() -> AIConfig:
         "For example, 'an AI designed to autonomously develop and run businesses with"
         " the sole goal of increasing your net worth.'",
     )
-    ai_role = utils.clean_input(f"{ai_name} is: ")
+    ai_role = ai_info_json["ai_role"]
     if ai_role == "":
         ai_role = "an AI designed to autonomously develop and run businesses with the"
         " sole goal of increasing your net worth."
@@ -61,17 +75,14 @@ def prompt_user() -> AIConfig:
         " multiple businesses autonomously'",
     )
     print("Enter nothing to load defaults, enter nothing when finished.", flush=True)
-    ai_goals = []
-    for i in range(5):
-        ai_goal = utils.clean_input(f"{Fore.LIGHTBLUE_EX}Goal{Style.RESET_ALL} {i+1}: ")
-        if ai_goal == "":
-            break
-        ai_goals.append(ai_goal)
+    ai_goals = ai_info_json["ai_goals"]
     if not ai_goals:
         ai_goals = [
             "Increase net worth",
             "Grow Twitter Account",
             "Develop and manage multiple businesses autonomously",
         ]
+    # 清空本地AI配置
+    my_file_util.write_ai_info("")
 
     return AIConfig(ai_name, ai_role, ai_goals)
