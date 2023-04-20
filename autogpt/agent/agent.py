@@ -60,7 +60,8 @@ class Agent:
         command_name = None
         arguments = None
         user_input = ""
-        # 当前执行进度【step 0: start 1: thinking 2: wait user 3: executing 4: result】
+        pre_command_result = ""
+        # 当前执行进度【step 0: start 1: thinking 2: wait user 3: executing 4: result 99: continue】
 
         while True:
             # Discontinue if continuous limit is reached
@@ -76,6 +77,9 @@ class Agent:
                 break
 
             my_file_util.write_step("1")
+            my_file_util.write_tips("Thinking... ")
+            # 清空文件
+            my_file_util.write_openai_reply("")
             # Send message to AI, get response
             with Spinner("Thinking... "):
                 assistant_reply = chat_with_ai(
@@ -87,9 +91,11 @@ class Agent:
                 )  # TODO: This hardcodes the model to use GPT3.5. Make this an argument
 
             assistant_reply_json = fix_json_using_multiple_techniques(assistant_reply)
-
+            temp_json = assistant_reply_json
+            if len(pre_command_result) > 0:
+                temp_json["system"] = pre_command_result
             # openai返回结果写入
-            my_file_util.write_openai_reply(assistant_reply)
+            my_file_util.write_openai_reply(json.dumps(temp_json))
 
             my_file_util.write_step("2")
 
@@ -208,8 +214,6 @@ class Agent:
             # history
             if result is not None:
                 self.full_message_history.append(create_chat_message("system", result))
-                # 命令执行结果写入文件
-                my_file_util.write_command_result(result)
                 my_file_util.write_step("4")
                 logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
             else:
@@ -220,3 +224,4 @@ class Agent:
                 logger.typewriter_log(
                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                 )
+            pre_command_result = result

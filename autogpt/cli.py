@@ -1,5 +1,6 @@
 """Main script for the autogpt package."""
 import click
+import my.oper_file as my_file_util
 
 
 @click.group(invoke_without_command=True)
@@ -81,6 +82,7 @@ def main(
     from autogpt.prompt import construct_prompt
     from autogpt.utils import get_latest_bulletin
 
+    my_file_util.write_auth("")
     if ctx.invoked_subcommand is None:
         cfg = Config()
         # TODO: fill in llm values here

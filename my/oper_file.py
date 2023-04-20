@@ -56,9 +56,19 @@ def read_tips():
     return read_file(tips_file_path)
 
 
-def write_file(file_path, text):
-    # 打开文件，如果文件不存在则创建一个新文件
+def write_file(file_path, text    ):
     file = open(file_path, "w")
+    # 写入字符串到文件
+    file.write(text)
+    # 关闭文件
+    file.close()
+
+
+def write_file_with_mode(file_path, text, mode):
+    if mode is None:
+        mode = "w"
+    # 打开文件，如果文件不存在则创建一个新文件， 模式分为覆盖写入:w，追加写入:a
+    file = open(file_path, mode)
     # 写入字符串到文件
     file.write(text)
     # 关闭文件

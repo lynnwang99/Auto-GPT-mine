@@ -1,1 +1,2 @@
-Welcome back!  Would you like me to return to being ai_name?
+Welcome to Auto-GPT! 
+Create an AI-Assistant: Set your AI name and role and goals.
