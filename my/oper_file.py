@@ -1,11 +1,9 @@
-import json
-
-command_result_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/command_result.txt"
-auth_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/input.txt"
-openai_reply_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/openai_reply.txt"
-step_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/step.txt"
-ai_info_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/ai_info.txt"
-tips_file_path = "/Users/wangyilian/PycharmProjects/Auto-GPT-mine/my/cache/tips.txt"
+command_result_file_path = "my/cache/command_result.txt"
+auth_file_path = "my/cache/input.txt"
+openai_reply_file_path = "my/cache/openai_reply.txt"
+step_file_path = "my/cache/step.txt"
+ai_info_file_path = "my/cache/ai_info.txt"
+tips_file_path = "my/cache/tips.txt"
 
 
 def write_command_result(text):
