@@ -11,7 +11,6 @@ from autogpt.json_utils.utilities import validate_json
 from autogpt.logs import logger, print_assistant_thoughts
 from autogpt.speech import say_text
 from autogpt.spinner import Spinner
-from autogpt.utils import clean_input
 import my.oper_file as my_file_util
 
 

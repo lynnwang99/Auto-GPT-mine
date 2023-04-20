@@ -2,9 +2,8 @@
 import json
 import time
 
-from colorama import Fore, Style
+from colorama import Fore
 
-from autogpt import utils
 from autogpt.config.ai_config import AIConfig
 from autogpt.logs import logger
 import my.oper_file as my_file_util
