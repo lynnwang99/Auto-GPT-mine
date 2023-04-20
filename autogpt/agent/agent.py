@@ -215,6 +215,7 @@ class Agent:
                 self.full_message_history.append(create_chat_message("system", result))
                 my_file_util.write_step("4")
                 logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
+                pre_command_result = result
             else:
                 self.full_message_history.append(
                     create_chat_message("system", "Unable to execute command")
@@ -223,4 +224,5 @@ class Agent:
                 logger.typewriter_log(
                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                 )
-            pre_command_result = result
+                pre_command_result = ""
+

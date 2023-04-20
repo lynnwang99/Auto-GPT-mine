@@ -81,8 +81,9 @@ def main(
     from autogpt.memory import get_memory
     from autogpt.prompt import construct_prompt
     from autogpt.utils import get_latest_bulletin
-
+    # 清空文件
     my_file_util.write_auth("")
+    my_file_util.write_tips("")
     if ctx.invoked_subcommand is None:
         cfg = Config()
         # TODO: fill in llm values here

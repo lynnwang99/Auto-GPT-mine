@@ -35,7 +35,10 @@ def get_response():
     elif step == "0":
         content = file_util.read_tips()
         need_auth = 1
-    resu = {"step": step, "content": content, "needAuth": need_auth}
+    if is_json(content):
+        resu = {"step": step, "content": json.loads(content), "needAuth": need_auth}
+    else:
+        resu = {"step": step, "content": content, "needAuth": need_auth}
     return resu
 
 
@@ -83,31 +86,20 @@ def auth_operation():
         while len(openai_reply) == 0:
             time.sleep(1)
             openai_reply = file_util.read_openai_reply()
-            result_json["reply"] = openai_reply
+            if is_json(openai_reply):
+                result_json["reply"] = json.loads(openai_reply)
+            else:
+                result_json["reply"] = openai_reply
     result_json["need_create_ai"] = need_create_ai
     return result_json
 
 
-# @server.route('/createGoals', methods=['post'])
-# def create_goals():
-#     ai_name = request.json.get("aiName")
-#     ai_role = request.json.get("aiRole")
-#     ai_goals = request.json.get("aiGoals")
-#     info = {"ai_name": ai_name, "ai_role": ai_role, "ai_goals": ai_goals}
-#     file_util.write_ai_info(json.dumps(info))
-#     resu = {'code': 200, 'message': '操作成功!'}
-#     return json.dumps(resu, ensure_ascii=False)
-#
-#
-# @server.route('/getDetail', methods=['get'])
-# def get_detail():
-#     step = request.args.get("step")
-#     content = ""
-#     if step == "2":
-#         content = file_util.read_openai_reply()
-#     elif step == "4":
-#         content = file_util.read_command_result()
-#     return content
+def is_json(myjson):
+    try:
+        json.loads(myjson)
+    except ValueError:
+        return False
+    return True
 
 
 if __name__ == '__main__':
